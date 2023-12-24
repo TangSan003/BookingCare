@@ -1,5 +1,7 @@
+const CRUDService= require('../services/CRUDService')
 
 const db= require("../models/index")
+
 let getHomePage = async(req,res)=>{
     try {
         let data = await db.User.findAll()
@@ -15,8 +17,62 @@ let getHomePage = async(req,res)=>{
 let getAboutPage = (req,res)=>{
     return res.render('test/about.ejs');
 }
+let getCrud = (req,res)=>{
+    try {
+        return res.render('crud.ejs',{createUsed:null});
+    } catch (error) {
+        console.log(error)
+    }
+    
+}
+let postCrud = async(req,res)=>{
+    let createUsed = await CRUDService.CreateNewUser(req.body)
+    return res.render('crud.ejs',{createUsed: createUsed});
+}
+let displayGetCRUD = async(req,res)=>{
+    try{
+        let Listuser = await CRUDService.getAllDataUser()
+        return res.render('displayCRUD.ejs',{
+            dataTable: Listuser,
+            action: null
+        })
+    }
+    catch(e){
+        console.log(e)
+    }
+    
+}
+let getUserById=async(req,res)=>{
+    let dataUser = await CRUDService.getUserById(req.query.id)
+    return res.render("editCRUD.ejs",{
+        User: dataUser,
+        updated: null
+    })
+}
 
+let updateUserById=async(req,res)=>{
+    let updated = await CRUDService.updateUserById(req.body);
+    let Listuser = await CRUDService.getAllDataUser()
+    return res.render('displayCRUD.ejs',{
+        dataTable: Listuser,
+        action: updated
+    })    
+}
+let deleteUserById=async(req,res)=>{
+    let deleteUser = await CRUDService.deleteUserById(req.query.id)
+    let Listuser = await CRUDService.getAllDataUser()
+    return res.render('displayCRUD.ejs',{
+        dataTable: Listuser,
+        action: deleteUser
+    })
+}
 module.exports ={
     getHomePage: getHomePage,
-    getAboutPage: getAboutPage
+    getAboutPage: getAboutPage,
+    getCrud: getCrud,
+    postCrud: postCrud,
+    displayGetCRUD: displayGetCRUD,
+    getUserById: getUserById,
+    updateUserById: updateUserById,
+    deleteUserById: deleteUserById,
 }
